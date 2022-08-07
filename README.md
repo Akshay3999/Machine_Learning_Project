@@ -8,3 +8,15 @@ The dataset is taken from a Kaggle. You can download the dataset from [here](htt
 
 ## Approach :
 Applying machine learing tasks like Data Exploration, Data Cleaning, Feature Engineering, Model Building and model testing to build a solution that should able to predict the premium of the personal for health insurance.
+
+- **Data Exploration :** Exploring the dataset using pandas, numpy, matplotlib, plotly and seaborn.
+- **Exploratory Data Analysis :** Plotted different graphs to get more insights about dependent and independent variables/features.
+- **Feature Engineering :** Numerical features scaled down and Categorical features encoded.
+- **Model Building :** In this step, first dataset Splitting is done. After that model is trained on different Machine Learning Algorithms such as:
+    1) Linear Regression
+    2) Decision Tree Regressor
+    3) Random Forest Regressor
+    4) Gradient Boosting Regressor
+- **Model Selection :** Tested all the models to check the R-squared and best R-squared model selected for GridSearchCV and best parameters to be find out.
+- **Pickle File** : Selected model as per best R-squared and GridSearchCv best parameters,and created pickle file using pickle library.
+- **Webpage &Deployment :** Created a web application that takes all the necessary inputs from the user & shows the output. Then deployed project on the Heroku Platform.
