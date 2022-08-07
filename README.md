@@ -5,3 +5,6 @@ The goal of this project is to give people an estimate of how much they need bas
 
 ## Dataset :
 The dataset is taken from a Kaggle. You can download the dataset from [here](https://www.kaggle.com/noordeen/insurance-premium-prediction)
+
+## Approach :
+Applying machine learing tasks like Data Exploration, Data Cleaning, Feature Engineering, Model Building and model testing to build a solution that should able to predict the premium of the personal for health insurance.
