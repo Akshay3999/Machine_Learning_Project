@@ -4,10 +4,9 @@ from typing import List
 
 # Declaring variables for setup functions
 PROJECT_NAME="InsurancePremiumPrediction"
-VERSION="0.0.1"
+VERSION="0.0.3"
 AUTHOR="Akshay Tate"
 DESCRIPTION="This is my first self made project"
-PACKAGES=["Insurance"]
 REQUIREMENT_FILE_NAME="requirements.txt"
 
 def get_requirements_list()->List[str]:
@@ -20,7 +19,7 @@ def get_requirements_list()->List[str]:
     of libraries mentioned in requirements.txt file
     """
     with open(REQUIREMENT_FILE_NAME) as requirement_file:
-        return requirement_file.readlines()
+        return requirement_file.readlines().remove("-e .")
 
 setup(
     name=PROJECT_NAME,
