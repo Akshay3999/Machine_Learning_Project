@@ -4,7 +4,7 @@ app=Flask(__name__)
 
 @app.route("/",methods=['GET','POST'])
 def index():
-    return "CI CD pipline has been established"
+    return "CI CD pipline has been established and rerun"
 
 if __name__=="__main__":
     app.run(debug=True)
