@@ -14,6 +14,7 @@ def index():
         logging.info(Insurance.error_message)
         logging.info("We are testing logging module")
     return "CI CD pipline has been established and rerun"
+    return "https://www.pexels.com/search/cat/"
 
 if __name__=="__main__":
     app.run(debug=True)
