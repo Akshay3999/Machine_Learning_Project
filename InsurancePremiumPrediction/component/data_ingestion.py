@@ -1,132 +1,120 @@
-
-from income_prediction.logger import logging
-from income_prediction.exception import IncomeException
-from income_prediction.entity.entity_config import DataIngestionConfig
+from InsurancePremiumPrediction.entity.config_entity import DataIngestionConfig
 import sys,os
-import pandas as pd
-from income_prediction.entity.artifact_entity import DataIngestionArtifact
-from sklearn.model_selection import StratifiedShuffleSplit
+from InsurancePremiumPrediction.exception import InsuranceException
+from InsurancePremiumPrediction.logger import logging
+from InsurancePremiumPrediction.entity.artifact_entity import DataIngestionArtifact
+import tarfile
 import numpy as np
-import tarfile # extract zip files
 from six.moves import urllib
 import pandas as pd
-
+from sklearn.model_selection import StratifiedShuffleSplit
 
 
 class DataIngestion:
+
     def __init__(self,data_ingestion_config:DataIngestionConfig):
         try:
-            logging.info(f"{'>>'*20}Data Ingestion log started.{'<<'*20} ")
-            self.data_ingestion_config=data_ingestion_config
+            logging.info(f"{'+'*20}Data Ingestion log started.{'+'*20}")
+            self.data_ingestion_config = data_ingestion_config
+        
         except Exception as e:
-            raise IncomeException(e,sys) from e
+            raise InsuranceException(e,sys)
 
-
-    def download_income_prediction_data(self,) -> str:
+    def download_Insurance_data(self,):
         try:
-            #extraction remote url to download dataset
-            download_url = self.data_ingestion_config.dataset_download_url
+            # extracting remote url to downlod dataset
+            download_url= self.data_ingestion_config.dataset_dawnlod_url
 
             #folder location to download file
-            tgz_download_dir = self.data_ingestion_config.tgz_download_dir
+            zip_download_dir= self.data_ingestion_config.zip_dawnload_dir
             
-            if os.path.exists(tgz_download_dir):
-                os.remove(tgz_download_dir)
+            if os.path.exists(zip_download_dir):
+                os.remove(zip_download_dir)
+            os.makedirs(zip_download_dir,exist_ok=True)
 
-            os.makedirs(tgz_download_dir,exist_ok=True)
+            insurance_file_name = os.path.basename(download_url)
 
-            income_prediction_file_name = os.path.basename(download_url)
+            zip_file_path = os.path.join(zip_download_dir,insurance_file_name)
 
-            tgz_file_path = os.path.join(tgz_download_dir, income_prediction_file_name)
-
-            logging.info(f"Downloading file from :[{download_url}] into :[{tgz_file_path}]")
-            urllib.request.urlretrieve(download_url, tgz_file_path)
-            logging.info(f"File :[{tgz_file_path}] has been downloaded successfully.")
-            return tgz_file_path
-
+            logging.info(f"Downloading file from :[{download_url}] into :[{zip_file_path}]")
+            urllib.request.urlretrieve(download_url,zip_file_path)
+            logging.info(f"File :[{zip_file_path}] has been download successufully.")
+            return zip_file_path
+        
         except Exception as e:
-            raise IncomeException(e,sys) from e
+            raise InsuranceException(e,sys) from e
 
-    def extract_tgz_file(self,tgz_file_path:str):
+
+    def extract_zip_file(self,zip_file_path):
         try:
             raw_data_dir = self.data_ingestion_config.raw_data_dir
 
             if os.path.exists(raw_data_dir):
                 os.remove(raw_data_dir)
 
-            os.makedirs(raw_data_dir,exist_ok=True)
+            os.remove(raw_data_dir,exist_ok=True)
 
-            logging.info(f"Extracting tgz file: [{tgz_file_path}] into dir: [{raw_data_dir}]")
-            with tarfile.open(tgz_file_path) as income_prediction_tgz_file_obj:
-                income_prediction_tgz_file_obj.extractall(path=raw_data_dir)
-            logging.info(f"Extraction completed")
+            os.makedirs(raw_data_dir,exist_ok = True)
+
+            logging.info(f"Extracting zip file: [{zip_file_path}] into dir: [{raw_data_dir}]")
+            with tarfile.open(zip_file_path) as insurance_zip_file_obj:
+                insurance_zip_file_obj.extractall(path=raw_data_dir)
+            
+            logging.info(f"Extracting completed")
 
         except Exception as e:
-            raise IncomeException(e,sys) from e
-        
-    def split_data_as_train_test(self) -> DataIngestionArtifact:
+            raise InsuranceException(e,sys) from e
+
+    def splite_data_as_train_test(self) -> DataIngestionArtifact:
         try:
             raw_data_dir = self.data_ingestion_config.raw_data_dir
 
             file_name = os.listdir(raw_data_dir)[0]
 
-            income_prediction_file_path = os.path.join(raw_data_dir,file_name)
+            insurance_file_path=os.path.join(raw_data_dir,file_name)
 
+            insurance_data_frame = pd.read_csv(insurance_file_path)
 
-            logging.info(f"Reading csv file: [{income_prediction_file_path}]")
-            income_prediction_data_frame = pd.read_csv(income_prediction_file_path)
-
-            income_prediction_data_frame["age_add"] = pd.cut(
-                income_prediction_data_frame["age"],
-                bins=[17.0, 24.3, 31.6, 38.9, 46.2,53.5,60.8,58.1,75.4,82.7, np.inf],
-                labels=[1,2,3,4,5,6,7,8,9]
-            )
-            
-
-            logging.info(f"Splitting data into train and test")
-            strat_train_set = None
-            strat_test_set = None
-
+            insurance_data_frame['bmi_category']=pd.cut(
+                insurance_data_frame.bmi,bins=[10,20,30,40,50,np.inf],
+                labels=[1,2,3,4,5])
             split = StratifiedShuffleSplit(n_splits=1, test_size=0.2, random_state=42)
 
-            for train_index,test_index in split.split(income_prediction_data_frame, income_prediction_data_frame["age_add"]):
-                strat_train_set = income_prediction_data_frame.loc[train_index].drop(["age_add"],axis=1)
-                strat_test_set = income_prediction_data_frame.loc[test_index].drop(["age_add"],axis=1)
+            for train_index,test_index in split.split(insurance_data_frame,insurance_data_frame.bmi_category):
+                train_dataframe=insurance_data_frame.loc[train_index]
+                test_dataframe=insurance_data_frame.loc[test_index]
+                train_dataframe=train_dataframe.drop(columns='bmi_category')
+                test_dataframe=test_dataframe.drop(columns='bmi_category')
 
-            train_file_path = os.path.join(self.data_ingestion_config.ingested_train_dir,
-                                            file_name)
-
-            test_file_path = os.path.join(self.data_ingestion_config.ingested_test_dir,
-                                        file_name)
-            
-            if strat_train_set is not None:
+            train_file_path=os.path.join(self.data_ingestion_config.ingested_train_dir,file_name)
+            test_file_path=os.path.join(self.data_ingestion_config.ingested_test_dir,file_name)
+           
+            if train_dataframe is not None:
                 os.makedirs(self.data_ingestion_config.ingested_train_dir,exist_ok=True)
-                logging.info(f"Exporting training datset to file: [{train_file_path}]")
-                strat_train_set.to_csv(train_file_path,index=False)
+                train_dataframe.to_csv(train_file_path,index=False)
 
-            if strat_test_set is not None:
-                os.makedirs(self.data_ingestion_config.ingested_test_dir, exist_ok= True)
-                logging.info(f"Exporting test dataset to file: [{test_file_path}]")
-                strat_test_set.to_csv(test_file_path,index=False)
-            
 
-            data_ingestion_artifact = DataIngestionArtifact(train_file_path=train_file_path,
-                                test_file_path=test_file_path,
-                                is_ingested=True,
-                                message=f"Data ingestion completed successfully."
-                                )
-            logging.info(f"Data Ingestion artifact:[{data_ingestion_artifact}]")
+            if test_dataframe is not None:
+                os.makedirs(self.data_ingestion_config.ingested_test_dir,exist_ok=True)
+                test_dataframe.to_csv(test_file_path,index=False)
+
+            data_ingestion_artifact=DataIngestionArtifact(train_file_path=train_file_path,
+                                                          test_file_path=test_file_path,
+                                                          is_ingested=True,
+                                                          message=f"Data Ingestion Completed")
+            logging.info(f"{'*'*20} Data Ingestion Successfully {'*'*20}")
             return data_ingestion_artifact
+        except Exception as e:
+            raise InsuranceException(e,sys) from e
 
-        except Exception as e:
-            raise IncomeException(e,sys) from e
-    def initiate_data_ingestion(self)->DataIngestionArtifact:
+    def initiate_data_ingestion(self)-> DataIngestionArtifact:
         try:
-            tgz_file_path =  self.download_income_prediction_data()
-            self.extract_tgz_file(tgz_file_path=tgz_file_path)
-            return self.split_data_as_train_test()
+            zip_file_path = self.download_insurance_data()
+
+            self.extract_zip_file(zip_file_path=zip_file_path)
+            return self.splite_data_as_train_test()
         except Exception as e:
-            raise IncomeException(e,sys) from e
+            raise InsuranceException(e,sys) from e
 
     def __del__(self):
-        logging.info(f"{'='*20}Data Ingestion log completed.{'='*20} \n\n")
+        logging.info(f"{'#'*20} Data Ingestion Log Completed .{'#'*20} \n\n")
