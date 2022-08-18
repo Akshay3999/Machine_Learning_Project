@@ -34,7 +34,7 @@ class Configuration:
 
             zip_download_dir = os.path.join(
                 data_ingestion_artifact_dir,
-                data_ingestion_info[DATA_INGESTION_RAW_DATA_DIR_KEY])
+                data_ingestion_info[DATA_INGESTION_ZIP_DOWNLOAD_DIR_NAME_KEY])
 
             raw_data_dir=os.path.join(data_ingestion_artifact_dir,
             data_ingestion_info[DATA_INGESTION_RAW_DATA_DIR_KEY])
@@ -85,7 +85,6 @@ class Configuration:
             artifact_dir = os.path.join(ROOT_DIR,
             training_pipeline_config[TRAINING_PIPELINE_NAME_KEY],
             training_pipeline_config[TRAINING_PIPELINE_ARTIFACT_DIR_KEY])
-            
             training_pipeline_config = TrainingPipelineConfig(artifact_dir=artifact_dir)
             logging.info(f"Training pipeline config: {training_pipeline_config}")
             return training_pipeline_config

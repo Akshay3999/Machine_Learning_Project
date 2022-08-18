@@ -45,7 +45,5 @@ class Pipeline:
             #data ingestion
 
             data_ingestion_artifact = self.start_data_ingestion()
-
-
         except Exception as e:
             raise InsuranceException(e,sys) from e
