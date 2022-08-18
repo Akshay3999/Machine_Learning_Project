@@ -5,6 +5,7 @@ __pycache__/
 
 # C extensions
 *.so
+InsurancePremiumPrdiction/artifact
 
 # Distribution / packaging
 .Python
