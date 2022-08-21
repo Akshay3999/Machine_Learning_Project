@@ -23,17 +23,18 @@ class DataIngestion:
         try:
             download_url=self.data_ingestion_config.dataset_download_url
 
-            zip_download_dir=self.data_ingestion_config.zip_download_dir
+            zip_download_url=self.data_ingestion_config.zip_download_dir
 
-            if os.path.exists(zip_download_dir):
-                os.remove(zip_download_dir)
-            os.makedirs(zip_download_dir,exist_ok=True)
+            if os.path.exists(zip_download_url):
+                os.remove(zip_download_url)
+            os.makedirs(zip_download_url,exist_ok=True)
 
-            insurance_file_name=os.path.basename(download_url)
-            zip_file_path=os.path.join(zip_download_dir,insurance_file_name)
-            logging.info(f"Downloading file from :[{download_url}] into: [{zip_file_path}] ")
+            insurance_file_name=DATA_INGESTION_ZIP_DOWNLOAD_FILE_NAME_KEY
+            zip_file_path=os.path.join(zip_download_url,insurance_file_name)
+            logging.info(f"Downloading file from :[{download_url}]")
             urllib.request.urlretrieve(download_url,zip_file_path)
-            logging.info(f"File :[{zip_file_path}] has been downloaded successfully. ")
+            logging.info(f"File [{download_url}] has been downloaded successfully at [{zip_file_path}] . ")
+            
             
             return zip_file_path
         
